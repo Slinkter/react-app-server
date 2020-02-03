@@ -1,17 +1,19 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-admin.initializeApp();
-//
+const app = require('express')();
+const firebase = require('firebase');
 const firebaseConfig = {
   apiKey: "AIzaSyApCLCOdgwcdpvMQhEdeczgaXm9IHIBZBI",
   authDomain: "webproject-f896a.firebaseapp.com",
   databaseURL: "https://webproject-f896a.firebaseio.com",
   projectId: "webproject-f896a",
   storageBucket: "webproject-f896a.appspot.com",
-  messagingSenderId: "1034456639516"
+  messagingSenderId: "1034456639516",
+  appId: "1:1034456639516:web:998100ee7aa86137b857d9",
+  measurementId: "G-2T7W05328N"
 };
+admin.initializeApp();
 
-const firebase = require('firebase');
 firebase.initializeApp(firebaseConfig);
 //
 app.get("/screams", (req, res) => {
@@ -54,27 +56,27 @@ app.post("/scream", (req, res) => {
       console.error(err);
     });
 });
-
-app.post('/signup', (req, res) => {
+// Signup route
+app.post("/signup", (req, res) => {
   const newUser = {
     email: req.body.email,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
     handle: req.body.handle
   };
+
+  firebase
+    .auth()
+    .createUserWithEmailAndPassword(newUser.email, newUser.password)
+    .then(data => {
+      return res
+        .status(201)
+        .json({ message: ` user ${data.user.uid} signed up sucessfully ` });
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    });
 });
 
-firebase
-  .auth()
-  .createUserWithEmailAndPassword(newUser.email, newUser.password)
-  .then(data => {
-    return res
-      .status(201)
-      .json({ message: ` user ${data.user.uid} signed up sucessfully ` });
-  })
-  .catch(err => {
-    console.error(err);
-    return res.status(500).json({ error: err.code });
-  });
-
-exports.api = functions.region("us-east1").https.onRequest(app);
+exports.api = functions.https.onRequest(app);
