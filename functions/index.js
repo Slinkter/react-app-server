@@ -22,7 +22,7 @@ const FBAuth = (req, res, next) => {
   let idToken;
   if (
     req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
+    req.headers.authorization.startsWith("Bearer ")
   ) {
     idToken = req.headers.authorization.split("Bearer ")[1];
   } else {
@@ -46,6 +46,7 @@ const FBAuth = (req, res, next) => {
     })
     .catch(err => {
       console.error("error while verifying token", err);
+      return res.status(403).json(err)
     });
 };
 
