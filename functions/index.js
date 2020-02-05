@@ -2,6 +2,8 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const app = require("express")();
 const firebase = require("firebase");
+admin.initializeApp();
+const db = admin.firestore();
 const firebaseConfig = {
   apiKey: "AIzaSyApCLCOdgwcdpvMQhEdeczgaXm9IHIBZBI",
   authDomain: "webproject-f896a.firebaseapp.com",
@@ -12,30 +14,9 @@ const firebaseConfig = {
   appId: "1:1034456639516:web:998100ee7aa86137b857d9",
   measurementId: "G-2T7W05328N"
 };
-admin.initializeApp();
 
 firebase.initializeApp(firebaseConfig);
 
-const db = admin.firestore();
-//
-app.get("/screams", (req, res) => {
-  db.collection("screams")
-    .orderBy("createAt", "desc")
-    .get()
-    .then(data => {
-      let screams = [];
-      data.forEach(doc => {
-        screams.push({
-          screamId: doc.id,
-          body: doc.data().body,
-          userHandle: doc.data().userHandle,
-          createdAt: doc.data().createAt
-        });
-      });
-      return res.json(screams);
-    })
-    .catch(err => console.error(err));
-});
 //
 const FBAuth = (req, res, next) => {
   let idToken;
@@ -45,7 +26,6 @@ const FBAuth = (req, res, next) => {
   ) {
     idToken = req.headers.authorization.split("Bearer ")[1];
   } else {
-    console.error("No Token found");
     return res.status(403).json({ error: "Unauthorized" });
   }
 
@@ -69,6 +49,47 @@ const FBAuth = (req, res, next) => {
     });
 };
 
+const isEmail = email => {
+  const regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  if (email.match(regEx)) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+const isEmpty = string => {
+  if (string.trim() === "") {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+//
+
+//================= 1 ==================
+app.get("/screams", (req, res) => {
+  let screams = [];
+  db.collection("screams")
+    .orderBy("createAt", "desc")
+    .get()
+    .then(data => {
+      // se esta almacenado en el array screams
+      data.forEach(doc => {
+        screams.push({
+          screamId: doc.id,
+          body: doc.data().body,
+          userHandle: doc.data().userHandle,
+          createdAt: doc.data().createAt
+        });
+      });
+      return res.json(screams);
+    })
+    .catch(err => console.error(err));
+});
+
+//================= 2 ==================
 app.post("/scream", FBAuth, (req, res) => {
   if (req.body.body.trim() === "") {
     return res.status(400).json({ body: "body must not be empty" });
@@ -90,26 +111,8 @@ app.post("/scream", FBAuth, (req, res) => {
       console.error(err);
     });
 });
-//
+//================= 3 ==================
 
-const isEmail = email => {
-  const regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  if (email.match(regEx)) {
-    return true;
-  } else {
-    return false;
-  }
-};
-
-const isEmpty = string => {
-  if (string.trim() === "") {
-    return true;
-  } else {
-    return false;
-  }
-};
-
-// Signup route
 app.post("/signup", (req, res) => {
   const newUser = {
     email: req.body.email,
@@ -117,9 +120,9 @@ app.post("/signup", (req, res) => {
     confirmPassword: req.body.confirmPassword,
     handle: req.body.handle
   };
-
+ // Validacion
   let errors = {};
-  // Validacion
+ 
   if (isEmpty(newUser.email)) {
     errors.mail = "Must not be empty";
   } else if (!isEmail(newUser.email)) {
@@ -181,8 +184,9 @@ app.post("/signup", (req, res) => {
       }
     });
 });
-
+//================= 4 ==================
 app.post("/login", (req, res) => {
+
   const user = {
     email: req.body.email,
     password: req.body.password
@@ -212,7 +216,7 @@ app.post("/login", (req, res) => {
       return res.json({ token });
     })
     .catch(err => {
-      console.error(err);
+   
       if (err.code === "auth/wrong-password") {
         return res
           .status(403)
@@ -222,5 +226,5 @@ app.post("/login", (req, res) => {
       }
     });
 });
-
+//=================  ==================
 exports.api = functions.https.onRequest(app);
