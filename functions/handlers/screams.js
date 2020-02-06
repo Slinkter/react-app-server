@@ -3,7 +3,7 @@ const { db } = require("../util/admin");
 exports.getAllScreams = (req, res) => {
   let screams = [];
   db.collection("screams")
-    .orderBy("createAt", "desc")
+    .orderBy("createAt", "desc") // Obtener los screams desde el ultimo insertado
     .get()
     .then(data => {
       // se esta almacenado en el array screams
@@ -17,10 +17,13 @@ exports.getAllScreams = (req, res) => {
       });
       return res.json(screams);
     })
-    .catch(err => console.error(err));
+    .catch(err => {
+      console.error(err);
+    });
 };
 
 exports.postOneScream = (req, res) => {
+  
   if (req.body.body.trim() === "") {
     return res.status(400).json({ body: "body must not be empty" });
   }
