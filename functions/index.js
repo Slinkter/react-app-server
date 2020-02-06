@@ -1,18 +1,9 @@
 const functions = require("firebase-functions");
 const app = require("express")();
+const FBAuth = require('./util/fbAuth.js')
 
-const { getAllScreams } = require("./handlers/screams");
+const { getAllScreams,postOneScream } = require("./handlers/screams");
 const { signup, login } = require("./handlers/users");
-
-const db = admin.firestore();
-const firebase = require("firebase");
-
-firebase.initializeApp(config);
-
-
-
-
-//
 
 //================= 1 ==================
 app.get("/screams", getAllScreams);
