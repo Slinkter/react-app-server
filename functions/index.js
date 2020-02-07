@@ -13,7 +13,7 @@ app.post("/signup", signup);
 //================= 4 ==================
 app.post("/login", login);
 //=================  ==================
-app.post('/user/image',FBAuth,uploadImage)
+app.post('/user/image', FBAuth, uploadImage);
 //=================  ==================
 
 exports.api = functions.https.onRequest(app);
