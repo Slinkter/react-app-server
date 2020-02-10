@@ -6,7 +6,9 @@ const {
   getAllScreams,
   postOneScream,
   getScream,
-  commentOnScream
+  commentOnScream,
+  likeScream,
+  unlikeScream
 } = require("./handlers/screams");
 const {
   signup,
@@ -33,4 +35,9 @@ app.get("/user", FBAuth, getAuthenticatedUser);
 app.get("/scream/:screamId", getScream);
 //=================  ==================
 app.post("/scream/:screamId/comment", FBAuth, commentOnScream);
+//
+app.get("/scream/:screamId/like", FBAuth, likeScream);
+//
+app.get("/scream/:screamId/unlike", FBAuth, unlikeScream);
+
 exports.api = functions.https.onRequest(app);
