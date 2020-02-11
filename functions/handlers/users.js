@@ -77,18 +77,18 @@ exports.login = (req, res) => {
   firebase
     .auth()
     .signInWithEmailAndPassword(user.email, user.password)
-    .then((data) => {
+    .then(data => {
       return data.user.getIdToken();
     })
-    .then((token) => {
+    .then(token => {
       return res.json({ token });
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
-      if (err.code === 'auth/wrong-password') {
+      if (err.code === "auth/wrong-password") {
         return res
           .status(403)
-          .json({ general: 'Wrong credentials, please try again' });
+          .json({ general: "Wrong credentials, please try again" });
       } else return res.status(500).json({ error: err.code });
     });
 };
@@ -126,7 +126,27 @@ exports.getAuthenticatedUser = (req, res) => {
       data.forEach(doc => {
         userData.likes.push(doc.data());
       });
-      return res.json(userData);
+      return db
+        .collection("notifications")
+        .where("recipient", "==", req.user.handle)
+        .orderBy("createdAt", "desc")
+        .limit(10)
+        .get();
+    })
+    .then(data => {
+      userData.notifications = [];
+      data.forEach(doc => {
+        userData.notifications.push({
+          recipient: doc.data().recipient,
+          sender: doc.data().recipient,
+          createdAt: doc.data().createdAt,
+          screamId: doc.data().screamId,
+          type: doc.data().type,
+          read: doc.data().read,
+          notificationId: doc.id
+        });
+      });
+      return res.json(userData)
     })
     .catch(err => {
       console.error(err);
