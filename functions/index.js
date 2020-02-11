@@ -17,7 +17,9 @@ const {
   login,
   uploadImage,
   addUserDetails,
-  getAuthenticatedUser
+  getAuthenticatedUser,
+  getUserDetails,
+  markNotificationsRead
 } = require("./handlers/users");
 //================= 1 ==================
 app.get("/screams", getAllScreams);
@@ -37,12 +39,16 @@ app.get("/user", FBAuth, getAuthenticatedUser);
 app.get("/scream/:screamId", getScream);
 //=================  ==================
 app.post("/scream/:screamId/comment", FBAuth, commentOnScream);
-//=================  ==================
+//=================  ==================∆≤≤
 app.get("/scream/:screamId/like", FBAuth, likeScream);
 //=================  ==================
 app.get("/scream/:screamId/unlike", FBAuth, unlikeScream);
 //=================  ==================
 app.delete("/scream/:screamId", FBAuth, deteleScream);
+
+app.get("user/:handle", getUserDetails);
+//
+app.post("/notifications", FBAuth, markNotificationsRead);
 //=================  ==================
 exports.api = functions.https.onRequest(app);
 
