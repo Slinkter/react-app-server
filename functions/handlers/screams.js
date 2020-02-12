@@ -12,7 +12,10 @@ exports.getAllScreams = (req, res) => {
           screamId: doc.id,
           body: doc.data().body,
           userHandle: doc.data().userHandle,
-          createdAt: doc.data().createAt
+          createdAt: doc.data().createAt,
+          commentCount : doc.data().comments,
+          likeCount : doc.data().likeCount,
+          userImage : doc.data().userImage
         });
       });
       return res.json(screams);
@@ -21,7 +24,7 @@ exports.getAllScreams = (req, res) => {
       console.error(err);
     });
 };
-
+//
 exports.postOneScream = (req, res) => {
   if (req.body.body.trim() === "") {
     return res.status(400).json({
@@ -52,7 +55,7 @@ exports.postOneScream = (req, res) => {
       console.error(err);
     });
 };
-
+//
 exports.getScream = (req, res) => {
   let screamData = {};
 
@@ -96,12 +99,11 @@ exports.getScream = (req, res) => {
       });
     });
 };
-
 //
 exports.commentOnScream = (req, res) => {
   //
   if (req.body.body.trim() === "") {
-    return res.status(400).json({ error: "must not be empty" });
+    return res.status(400).json({ comment : "must not be empty" });
   }
   //
   const newComment = {
@@ -219,7 +221,6 @@ exports.unlikeScream = () => {
       res.status(500).json({ error: err.code });
     });
 };
-
 //
 exports.deteleScream = (req, res) => {
   const document = db.doc(`/screams/${req.params.screamId}`);
@@ -243,5 +244,4 @@ exports.deteleScream = (req, res) => {
       return res.status(500).json({ error: err.code });
     });
 };
-
-
+//

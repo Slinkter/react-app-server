@@ -7,7 +7,7 @@ const {
   validateLoginData,
   reduceUserDetails
 } = require("../util/validators");
-
+//
 exports.signup = (req, res) => {
   let token, userId;
   const noImg = "no-img.png";
@@ -58,12 +58,14 @@ exports.signup = (req, res) => {
         if (err.code === "auth/email-already-in-use") {
           return res.status(400).json({ email: "Email is already is use" });
         } else {
-          return res.status(500).json({ error: err.code });
+          return res
+            .status(500)
+            .json({ general: "something went , please try again" });
         }
       });
   }
 };
-
+//
 exports.login = (req, res) => {
   const user = {
     email: req.body.email,
@@ -84,12 +86,9 @@ exports.login = (req, res) => {
       return res.json({ token });
     })
     .catch(err => {
-      console.error(err);
-      if (err.code === "auth/wrong-password") {
-        return res
-          .status(403)
-          .json({ general: "Wrong credentials, please try again" });
-      } else return res.status(500).json({ error: err.code });
+      return res
+        .status(403)
+        .json({ general: "Wrong credentials, please try again" });
     });
 };
 //
@@ -153,7 +152,6 @@ exports.getAuthenticatedUser = (req, res) => {
       return res.status(500).json({ error: err.code });
     });
 };
-
 //
 exports.uploadImage = (req, res) => {
   const BusBoy = require("busboy");
@@ -208,7 +206,6 @@ exports.uploadImage = (req, res) => {
   });
   busboy.end(req.rawBody);
 };
-
 //
 exports.getUserDetails = (req, res) => {
   let userData = {};
@@ -245,7 +242,7 @@ exports.getUserDetails = (req, res) => {
       return res.status(500).json({ error: err.code });
     });
 };
-
+//
 exports.markNotificationsRead = (req, res) => {
   let batch = db.batch();
   req.body.forEach(notificationId => {
