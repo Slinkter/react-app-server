@@ -3,7 +3,7 @@ const { db } = require("../util/admin");
 exports.getAllScreams = (req, res) => {
   let screams = [];
   db.collection("screams")
-    .orderBy("createAt", "desc") // Obtener los screams desde el ultimo insertado
+    //  .orderBy("createAt", "desc") // Obtener los screams desde el ultimo insertado
     .get()
     .then(data => {
       // se esta almacenado en el array screams
@@ -13,9 +13,9 @@ exports.getAllScreams = (req, res) => {
           body: doc.data().body,
           userHandle: doc.data().userHandle,
           createdAt: doc.data().createAt,
-          commentCount : doc.data().comments,
-          likeCount : doc.data().likeCount,
-          userImage : doc.data().userImage
+          commentCount: doc.data().comments,
+          likeCount: doc.data().likeCount,
+          userImage: doc.data().userImage
         });
       });
       return res.json(screams);
@@ -103,7 +103,7 @@ exports.getScream = (req, res) => {
 exports.commentOnScream = (req, res) => {
   //
   if (req.body.body.trim() === "") {
-    return res.status(400).json({ comment : "must not be empty" });
+    return res.status(400).json({ comment: "must not be empty" });
   }
   //
   const newComment = {
