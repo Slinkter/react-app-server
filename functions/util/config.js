@@ -1,4 +1,3 @@
-
 module.exports = {
     apiKey: "AIzaSyApCLCOdgwcdpvMQhEdeczgaXm9IHIBZBI",
     authDomain: "webproject-f896a.firebaseapp.com",
