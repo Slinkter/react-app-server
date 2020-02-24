@@ -1,19 +1,18 @@
 const { db } = require("../util/admin");
 exports.getAllScreams = (req, res) => {
   db.collection("screams")
-    .orderBy("createdAt", "desc")
     .get()
     .then(data => {
       let screams = [];
-      data.forEach(doc => {
+      data.forEach(x => {
         screams.push({
-          screamId: doc.id,
-          body: doc.data().body,
-          userHandle: doc.data().userHandle,
-          createdAt: doc.data().createdAt,
-          commentCount: doc.data().commentCount,
-          likeCount: doc.data().likeCount,
-          userImage: doc.data().userImage
+          screamId: x.id,
+          body: x.data().body,
+          userHandle: x.data().userHandle,
+          createdAt: x.data().createdAt,
+          commentCount: x.data().commentCount,
+          likeCount: x.data().likeCount,
+          userImage: x.data().userImage
         });
       });
       return res.json(screams);
@@ -63,7 +62,6 @@ exports.getScream = (req, res) => {
       screamData.screamId = doc.id;
       return db
         .collection("comments")
-        .orderBy("createdAt", "desc")
         .where("screamId", "==", req.params.screamId)
         .get();
     })

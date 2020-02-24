@@ -24,8 +24,8 @@ exports.signup = (req, res) => {
   if (!valid) return res.status(400).json(errors);
 
   const noImg = "no-img.png";
-
   let token, userId;
+
   db.doc(`/users/${newUser.handle}`)
     .get()
     .then(doc => {
@@ -62,7 +62,7 @@ exports.signup = (req, res) => {
       } else {
         return res
           .status(500)
-          .json({ general: "Something went wrong, please try again" });
+          .json({ general: "Something went wrong, please try again", err });
       }
     });
 };
@@ -115,13 +115,12 @@ exports.getUserDetails = (req, res) => {
   let userData = {};
   db.doc(`/users/${req.params.handle}`)
     .get()
-    .then(doc => {
-      if (doc.exists) {
-        userData.user = doc.data();
+    .then(document => {
+      if (document.exists) {
+        userData.user = document.data();
         return db
           .collection("screams")
           .where("userHandle", "==", req.params.handle)
-          .orderBy("createdAt", "desc")
           .get();
       } else {
         return res.status(404).json({ errror: "User not found" });
@@ -129,15 +128,15 @@ exports.getUserDetails = (req, res) => {
     })
     .then(data => {
       userData.screams = [];
-      data.forEach(doc => {
+      data.forEach(x => {
         userData.screams.push({
-          body: doc.data().body,
-          createdAt: doc.data().createdAt,
-          userHandle: doc.data().userHandle,
-          userImage: doc.data().userImage,
-          likeCount: doc.data().likeCount,
-          commentCount: doc.data().commentCount,
-          screamId: doc.id
+          body: x.data().body,
+          createdAt: x.data().createdAt,
+          userHandle: x.data().userHandle,
+          userImage: x.data().userImage,
+          likeCount: x.data().likeCount,
+          commentCount: x.data().commentCount,
+          screamId: x.id
         });
       });
       return res.json(userData);
@@ -152,9 +151,9 @@ exports.getAuthenticatedUser = (req, res) => {
   let userData = {};
   db.doc(`/users/${req.user.handle}`)
     .get()
-    .then(doc => {
-      if (doc.exists) {
-        userData.credentials = doc.data();
+    .then(x => {
+      if (x.exists) {
+        userData.credentials = x.data();
         return db
           .collection("likes")
           .where("userHandle", "==", req.user.handle)
@@ -163,27 +162,26 @@ exports.getAuthenticatedUser = (req, res) => {
     })
     .then(data => {
       userData.likes = [];
-      data.forEach(doc => {
-        userData.likes.push(doc.data());
+      data.forEach(x => {
+        userData.likes.push(x.data());
       });
       return db
         .collection("notifications")
         .where("recipient", "==", req.user.handle)
-        .orderBy("createdAt", "desc")
         .limit(10)
         .get();
     })
     .then(data => {
       userData.notifications = [];
-      data.forEach(doc => {
+      data.forEach(x => {
         userData.notifications.push({
-          recipient: doc.data().recipient,
-          sender: doc.data().sender,
-          createdAt: doc.data().createdAt,
-          screamId: doc.data().screamId,
-          type: doc.data().type,
-          read: doc.data().read,
-          notificationId: doc.id
+          recipient: x.data().recipient,
+          sender: x.data().sender,
+          createdAt: x.data().createdAt,
+          screamId: x.data().screamId,
+          type: x.data().type,
+          read: x.data().read,
+          notificationId: x.id
         });
       });
       return res.json(userData);
@@ -199,9 +197,7 @@ exports.uploadImage = (req, res) => {
   const path = require("path");
   const os = require("os");
   const fs = require("fs");
-
   const busboy = new BusBoy({ headers: req.headers });
-
   let imageToBeUploaded = {};
   let imageFileName;
 
