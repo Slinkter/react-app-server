@@ -1,6 +1,7 @@
-const admin = '';
-const db = '';
-admin = require("firebase-admin");
+const admin = require('firebase-admin');
+
 admin.initializeApp();
-db.admin.firestore();
+
+const db = admin.firestore();
+
 module.exports = { admin, db };
